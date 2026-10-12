@@ -24,7 +24,7 @@
         <td>{{ inv.pk }}</td>
         <td>{{ inv.customer.name }}</td>
         <td>{{ inv.created_at|date:"Y-m-d H:i" }}</td>
-        <td>{{ inv.total }}</td>
+        <td>₹{{ inv.total|floatformat:2 }}</td>
         <td class="text-end">
           <a class="btn btn-sm btn-outline-secondary" href="{% url 'billing:invoice-detail' inv.pk %}">View</a>
           <a class="btn btn-sm btn-outline-primary" href="{% url 'billing:invoice-pdf' inv.pk %}">PDF</a>

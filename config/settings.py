@@ -1,24 +1,27 @@
-"""Django settings for ShopBill (Stage 1).
+"""Django settings for ShopBill.
 
 - Secrets come from environment variables, never hardcoded.
-- SQLite by default; PostgreSQL when DATABASE_URL is set.
+- SQLite by default (local dev); PostgreSQL on Render via DATABASE_URL.
+- With DEBUG=False (production default) HTTPS/HSTS/secure cookies turn on.
 """
 
 import os
+import sys
 from pathlib import Path
-from urllib.parse import urlparse
+
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Dev-only fallback so `runserver` works without an .env file.
-# In production set DJANGO_SECRET_KEY in the environment.
+# Dev-only fallback so tests/runserver work without an .env file.
+# Production MUST set DJANGO_SECRET_KEY in the environment.
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "django-insecure-dev-only-do-not-use-in-production",
 )
 
-# Set DJANGO_DEBUG=False in production.
-DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes")
+# Production default is False; local dev sets DJANGO_DEBUG=True in .env.
+DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in ("1", "true", "yes")
 
 ALLOWED_HOSTS = [
     h.strip()
@@ -28,26 +31,16 @@ ALLOWED_HOSTS = [
     if h.strip()
 ]
 
-
-def _postgres_from_url(url):
-    """Parse a postgres:// URL into a Django DATABASES entry."""
-    parsed = urlparse(url)
-    return {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": parsed.path.lstrip("/"),
-        "USER": parsed.username or "",
-        "PASSWORD": parsed.password or "",
-        "HOST": parsed.hostname or "",
-        "PORT": str(parsed.port or ""),
-    }
-
+CSRF_TRUSTED_ORIGINS = [
+    h.strip() for h in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if h.strip()
+]
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
-if DATABASE_URL.startswith(("postgres://", "postgresql://")):
-    # Production: PostgreSQL (psycopg2-binary is already installed).
-    DATABASES = {"default": _postgres_from_url(DATABASE_URL)}
+if DATABASE_URL:
+    # Production (Render): PostgreSQL, connections persist across requests.
+    DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
 else:
-    # Development: SQLite file in the project root.
+    # Local development: SQLite file in the project root.
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -62,7 +55,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Local apps (Stage 1: empty shells except accounts auth/roles).
+    # Local apps.
     "accounts",
     "inventory",
     "billing",
@@ -71,6 +64,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # Serves static files in production (Render has no separate web server).
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -84,7 +79,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        # Project-level templates (base.html, home, registration).
+        # Project-level templates (base.html, home, registration, errors).
         "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -112,6 +107,15 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"  # collectstatic target for Render
+
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    # Compressed + hashed filenames so browsers cache safely.
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    },
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -121,3 +125,17 @@ AUTH_USER_MODEL = "accounts.User"
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "login"
+
+# Plain-http Django test client still needs to work, so skip HTTPS
+# enforcement while running the test suite; Render/production unaffected.
+_RUNNING_TESTS = "pytest" in sys.modules or "test" in sys.argv
+
+if not DEBUG and not _RUNNING_TESTS:
+    # Render terminates TLS at its proxy and forwards http internally.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True

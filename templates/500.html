@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Server error - ShopBill{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="display-4">500</h1>
+  <p class="lead">Something went wrong on our side.</p>
+  <p class="text-muted">Please try again, or come back later.</p>
+  <a class="btn btn-primary" href="{% url 'home' %}">Back to home</a>
+</div>
+{% endblock %}

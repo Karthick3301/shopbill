@@ -3,9 +3,14 @@
 {% block content %}
 <h1>Delete customer</h1>
 <p>Delete <strong>{{ object.name }}</strong>?</p>
-<form method="post">
-  {% csrf_token %}
-  <button class="btn btn-danger" type="submit">Delete</button>
-  <a class="btn btn-link" href="{% url 'billing:customer-list' %}">Cancel</a>
-</form>
+{% if object.invoices.count %}
+  <div class="alert alert-warning">This customer has {{ object.invoices.count }} invoice(s) and cannot be deleted while that sale history exists.</div>
+  <a class="btn btn-link" href="{% url 'billing:customer-list' %}">Back</a>
+{% else %}
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Delete</button>
+    <a class="btn btn-link" href="{% url 'billing:customer-list' %}">Cancel</a>
+  </form>
+{% endif %}
 {% endblock %}

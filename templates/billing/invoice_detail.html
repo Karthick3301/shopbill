@@ -17,8 +17,8 @@
       <tr>
         <td>{{ item.product.name }}</td>
         <td class="text-end">{{ item.quantity }}</td>
-        <td class="text-end">{{ item.unit_price }}</td>
-        <td class="text-end">{{ item.line_total }}</td>
+        <td class="text-end">₹{{ item.unit_price|floatformat:2 }}</td>
+        <td class="text-end">₹{{ item.line_total|floatformat:2 }}</td>
       </tr>
     {% endfor %}
   </tbody>
@@ -27,10 +27,10 @@
 
 <div class="col-12 col-md-4 ms-auto">
   <ul class="list-group">
-    <li class="list-group-item d-flex justify-content-between"><span>Subtotal</span><strong>{{ object.subtotal }}</strong></li>
-    <li class="list-group-item d-flex justify-content-between"><span>Tax</span><strong>{{ object.tax }}</strong></li>
-    <li class="list-group-item d-flex justify-content-between"><span>Discount</span><strong>{{ object.discount }}</strong></li>
-    <li class="list-group-item d-flex justify-content-between"><span>Total</span><strong>{{ object.total }}</strong></li>
+    <li class="list-group-item d-flex justify-content-between"><span>Subtotal</span><strong>₹{{ object.subtotal|floatformat:2 }}</strong></li>
+    <li class="list-group-item d-flex justify-content-between"><span>Tax</span><strong>₹{{ object.tax|floatformat:2 }}</strong></li>
+    <li class="list-group-item d-flex justify-content-between"><span>Discount</span><strong>₹{{ object.discount|floatformat:2 }}</strong></li>
+    <li class="list-group-item d-flex justify-content-between"><span>Total</span><strong>₹{{ object.total|floatformat:2 }}</strong></li>
   </ul>
 </div>
 <a class="btn btn-link mt-3" href="{% url 'billing:invoice-list' %}">Back to invoices</a>

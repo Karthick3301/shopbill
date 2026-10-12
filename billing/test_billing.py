@@ -82,6 +82,38 @@ def test_owner_can_delete_customer(client, owner, customer):
     assert not Customer.objects.filter(pk=customer.pk).exists()
 
 
+@pytest.mark.django_db
+def test_owner_cannot_delete_customer_with_invoices(client, owner, customer, cola):
+    create_invoice(
+        created_by=owner,
+        customer=customer,
+        lines=[{"product_id": cola.pk, "quantity": 1, "unit_price": None}],
+    )
+    client.force_login(owner)
+    # Refused with a redirect + friendly message, never a 500.
+    resp = client.post(reverse("billing:customer-delete", args=[customer.pk]), follow=True)
+    assert resp.status_code == 200
+    assert Customer.objects.filter(pk=customer.pk).exists()
+    assert "Cannot delete" in resp.content.decode()
+
+
+@pytest.mark.django_db
+def test_customer_delete_page_warns_and_hides_button(client, owner, customer, cola):
+    create_invoice(
+        created_by=owner,
+        customer=customer,
+        lines=[{"product_id": cola.pk, "quantity": 1, "unit_price": None}],
+    )
+    client.force_login(owner)
+    content = client.get(reverse("billing:customer-delete", args=[customer.pk])).content.decode()
+    assert "cannot be deleted" in content
+    assert ">Delete</button>" not in content
+    # A customer without invoices still gets the Delete button.
+    clean = Customer.objects.create(name="Clean")
+    content = client.get(reverse("billing:customer-delete", args=[clean.pk])).content.decode()
+    assert ">Delete</button>" in content
+
+
 # --- Stock reduction + SALE movements ---
 
 

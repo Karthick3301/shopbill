@@ -7,14 +7,14 @@
   <div class="col-12 col-md-4">
     <div class="card"><div class="card-body">
       <h2 class="h6 text-muted">Today's sales</h2>
-      <p class="fs-4 mb-0">{{ today_total }}</p>
+      <p class="fs-4 mb-0">₹{{ today_total|floatformat:2 }}</p>
       <p class="text-muted mb-0">{{ today_count }} invoice(s)</p>
     </div></div>
   </div>
   <div class="col-12 col-md-4">
     <div class="card"><div class="card-body">
       <h2 class="h6 text-muted">This month's sales</h2>
-      <p class="fs-4 mb-0">{{ month_total }}</p>
+      <p class="fs-4 mb-0">₹{{ month_total|floatformat:2 }}</p>
     </div></div>
   </div>
   <div class="col-12 col-md-4">

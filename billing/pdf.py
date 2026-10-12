@@ -41,21 +41,21 @@ def render_invoice_pdf(invoice):
             y = height - 50
             c.setFont("Helvetica", 11)
         c.drawString(40, y, item.product.name[:40])
-        c.drawRightString(380, y, f"{item.quantity} x {item.unit_price}")
-        c.drawRightString(480, y, f"{item.line_total:.2f}")
+        c.drawRightString(380, y, f"{item.quantity} x \u20B9{item.unit_price:.2f}")
+        c.drawRightString(480, y, f"\u20B9{item.line_total:.2f}")
         y -= 16
 
     y -= 8
     c.line(40, y, 480, y)
     y -= 18
-    c.drawRightString(480, y, f"Subtotal: {invoice.subtotal:.2f}")
+    c.drawRightString(480, y, f"Subtotal: \u20B9{invoice.subtotal:.2f}")
     y -= 16
-    c.drawRightString(480, y, f"Tax: {invoice.tax:.2f}")
+    c.drawRightString(480, y, f"Tax: \u20B9{invoice.tax:.2f}")
     y -= 16
-    c.drawRightString(480, y, f"Discount: {invoice.discount:.2f}")
+    c.drawRightString(480, y, f"Discount: \u20B9{invoice.discount:.2f}")
     y -= 18
     c.setFont("Helvetica-Bold", 12)
-    c.drawRightString(480, y, f"Total: {invoice.total:.2f}")
+    c.drawRightString(480, y, f"Total: \u20B9{invoice.total:.2f}")
 
     c.showPage()
     c.save()
