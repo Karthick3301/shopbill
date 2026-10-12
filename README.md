@@ -81,17 +81,29 @@ but not a superuser.)
 1. Push this repo to GitHub. No secrets are committed (`.env` and
    `db.sqlite3` are gitignored).
 2. Create a Render **PostgreSQL** database and a **Web Service** from the
-   repo with build command `./build.sh` (installs deps, runs
-   `collectstatic` and `migrate`).
+   repo with build command `bash build.sh` (installs deps, runs
+   `collectstatic` and `migrate`, then seeds demo data only when
+   `SEED_DEMO_DATA=true`).
 3. Set the Render start command to:
    `gunicorn config.wsgi:application --bind 0.0.0.0:$PORT`
-4. Set environment variables on the web service:
-   `DJANGO_DEBUG=False`, `DJANGO_SECRET_KEY` (generate a fresh one),
-   `DJANGO_ALLOWED_HOSTS` (your `.onrender.com` domain),
-   `CSRF_TRUSTED_ORIGINS` (e.g. `https://<app>.onrender.com`),
-   `DATABASE_URL` (Render provides this when the database is linked).
-5. After the first deploy, seed demo data (optional) via the Render shell:
-   `python manage.py seed_demo_data`.
+4. Set these environment variables on the web service:
+
+   | Variable | Example | Notes |
+   |---|---|---|
+   | `DJANGO_DEBUG` | `False` | Keep False in production (enables HTTPS-only). |
+   | `DJANGO_SECRET_KEY` | _(generate a fresh one)_ | Required; never commit it. |
+   | `DJANGO_ALLOWED_HOSTS` | `<app>.onrender.com` | Your Render domain. |
+   | `CSRF_TRUSTED_ORIGINS` | `https://<app>.onrender.com` | Needed for login/forms over HTTPS. |
+   | `DATABASE_URL` | _(Render provides this)_ | Set automatically when the database is linked. |
+   | `SEED_DEMO_DATA` | `true` | Optional: seeds demo users/catalog/invoices during the build. |
+   | `PYTHON_VERSION` | `3.13` | Pins the Python version Render builds with. |
+
+With `DEBUG=False` the app forces HTTPS (behind Render's proxy header),
+uses secure cookies, and enables HSTS.
+
+Notes on Render's free tier: a free PostgreSQL database expires after
+about 30 days (back up anything you need), and the first request after
+the service idles takes about a minute while it spins back up.
 
 With `DEBUG=False` the app forces HTTPS (behind Render's proxy header),
 uses secure cookies, and enables HSTS.

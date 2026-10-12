@@ -10,8 +10,13 @@ import sys
 from pathlib import Path
 
 import dj_database_url
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Local .env file for development (ignored if absent). Real environment
+# variables always win, so Render's dashboard values keep working as before.
+load_dotenv(BASE_DIR / ".env")
 
 # Dev-only fallback so tests/runserver work without an .env file.
 # Production MUST set DJANGO_SECRET_KEY in the environment.
