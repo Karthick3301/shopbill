@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Categories - ShopBill{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Categories</h1>
+  {% if user.is_owner %}
+    <a class="btn btn-primary" href="{% url 'inventory:category-add' %}">Add category</a>
+  {% endif %}
+</div>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-12 col-md-6">
+    <input class="form-control" type="search" name="q" value="{{ request.GET.q }}" placeholder="Search categories">
+  </div>
+  <div class="col-12 col-md-3">
+    <button class="btn btn-outline-primary w-100" type="submit">Search</button>
+  </div>
+</form>
+
+<div class="table-responsive">
+<table class="table table-striped align-middle">
+  <thead><tr><th>Name</th><th>Products</th><th></th></tr></thead>
+  <tbody>
+    {% for c in object_list %}
+      <tr>
+        <td>{{ c.name }}</td>
+        <td>{{ c.products.count }}</td>
+        <td class="text-end">
+          {% if user.is_owner %}
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'inventory:category-edit' c.pk %}">Edit</a>
+            <a class="btn btn-sm btn-outline-danger" href="{% url 'inventory:category-delete' c.pk %}">Delete</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="3" class="text-center text-muted">No categories found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% if is_paginated %}
+<nav><ul class="pagination">
+  {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}">Previous</a></li>{% endif %}
+  <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+  {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Products - ShopBill{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Products</h1>
+  {% if user.is_owner %}
+    <a class="btn btn-primary" href="{% url 'inventory:product-add' %}">Add product</a>
+  {% endif %}
+</div>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-12 col-md-5">
+    <input class="form-control" type="search" name="q" value="{{ q }}" placeholder="Search by name">
+  </div>
+  <div class="col-12 col-md-4">
+    <select class="form-select" name="category">
+      <option value="">All categories</option>
+      {% for c in categories %}
+        <option value="{{ c.id }}" {% if c.id|stringformat:"s" == selected_category %}selected{% endif %}>{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-12 col-md-3">
+    <button class="btn btn-outline-primary w-100" type="submit">Filter</button>
+  </div>
+</form>
+
+<div class="table-responsive">
+<table class="table table-striped align-middle">
+  <thead>
+    <tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for p in object_list %}
+      {# Low/out-of-stock rows are highlighted so staff notice at a glance. #}
+      <tr class="{% if p.stock == 0 %}table-danger{% elif p.is_low_stock %}table-warning{% endif %}">
+        <td>{{ p.name }}</td>
+        <td>{{ p.category.name }}</td>
+        <td>{{ p.price }}</td>
+        <td>
+          {{ p.stock }}
+          {% if p.stock == 0 %}
+            <span class="badge text-bg-danger">Out of stock</span>
+          {% elif p.is_low_stock %}
+            <span class="badge text-bg-warning">Low stock</span>
+          {% endif %}
+        </td>
+        <td class="text-end">
+          {% if user.is_owner %}
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'inventory:product-edit' p.pk %}">Edit</a>
+            <a class="btn btn-sm btn-outline-danger" href="{% url 'inventory:product-delete' p.pk %}">Delete</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="text-center text-muted">No products found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% if is_paginated %}
+<nav><ul class="pagination">
+  {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?q={{ q }}&category={{ selected_category }}&page={{ page_obj.previous_page_number }}">Previous</a></li>{% endif %}
+  <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+  {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?q={{ q }}&category={{ selected_category }}&page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

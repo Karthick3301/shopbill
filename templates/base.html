@@ -18,7 +18,8 @@
         <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
         {% if user.is_authenticated %}
           {# Staff can view products and bill; Owner sees everything. #}
-          <li class="nav-item"><a class="nav-link" href="#">Products</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'inventory:product-list' %}">Products</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'inventory:category-list' %}">Categories</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Billing</a></li>
           {% if user.is_owner %}
             <li class="nav-item"><a class="nav-link" href="#">Reports</a></li>

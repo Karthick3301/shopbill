@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} product - ShopBill{% endblock %}
+{% block content %}
+<h1>{% if object %}Edit{% else %}Add{% endif %} product</h1>
+<form method="post" class="col-12 col-md-6">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="btn btn-primary" type="submit">Save</button>
+  <a class="btn btn-link" href="{% url 'inventory:product-list' %}">Cancel</a>
+</form>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Delete product - ShopBill{% endblock %}
+{% block content %}
+<h1>Delete product</h1>
+<p>Delete <strong>{{ object.name }}</strong> (stock: {{ object.stock }})?</p>
+<form method="post">
+  {% csrf_token %}
+  <button class="btn btn-danger" type="submit">Delete</button>
+  <a class="btn btn-link" href="{% url 'inventory:product-list' %}">Cancel</a>
+</form>
+{% endblock %}
