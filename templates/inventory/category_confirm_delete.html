@@ -4,7 +4,7 @@
 <h1>Delete category</h1>
 <p>Delete <strong>{{ object.name }}</strong>?</p>
 {% if object.products.count %}
-  <div class="alert alert-warning">This category has {{ object.products.count }} product(s) and cannot be deleted until they are moved or removed.</div>
+  <div class="alert alert-warning">This category has {{ object.products.count }} product(s) (including deactivated ones, kept for history) and cannot be deleted until they are moved or removed.</div>
   <a class="btn btn-link" href="{% url 'inventory:category-list' %}">Back</a>
 {% else %}
   <form method="post">

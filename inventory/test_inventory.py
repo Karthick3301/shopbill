@@ -67,7 +67,9 @@ def test_staff_cannot_edit_or_delete_product(client, staff, product):
     assert client.get(reverse("inventory:product-edit", args=[product.pk])).status_code == 403
     assert client.get(reverse("inventory:product-delete", args=[product.pk])).status_code == 403
     assert client.post(reverse("inventory:product-delete", args=[product.pk])).status_code == 403
-    assert Product.objects.filter(pk=product.pk).exists()
+    # Soft delete must not have run: row still exists and stays active.
+    product.refresh_from_db()
+    assert product.is_active is True
 
 
 @pytest.mark.django_db
@@ -151,3 +153,55 @@ def test_low_stock_highlighted_in_list(client, owner, category):
     content = client.get(reverse("inventory:product-list")).content.decode()
     assert "Low stock" in content
     assert "table-warning" in content
+
+
+# --- Soft delete (is_active) ---
+
+
+@pytest.mark.django_db
+def test_deactivate_page_says_deactivate(client, owner, product):
+    client.force_login(owner)
+    content = client.get(reverse("inventory:product-delete", args=[product.pk])).content.decode()
+    assert "Deactivate" in content
+    assert "Delete product" not in content
+
+
+@pytest.mark.django_db
+def test_owner_deactivate_keeps_row_and_history(client, owner, product):
+    moves_before = StockMovement.objects.filter(product=product).count()
+    assert moves_before == 1
+    client.force_login(owner)
+    resp = client.post(reverse("inventory:product-delete", args=[product.pk]))
+    assert resp.status_code == 302
+    # Row kept with is_active=False; history kept; no movement logged.
+    product.refresh_from_db()
+    assert product.is_active is False
+    assert Product.objects.filter(pk=product.pk).exists()
+    assert StockMovement.objects.filter(product=product).count() == moves_before
+
+
+@pytest.mark.django_db
+def test_deactivated_hidden_from_list_search_and_filter(client, owner, category, product):
+    client.force_login(owner)
+    product.is_active = False
+    product.save(update_fields=["is_active", "updated_at"])
+    # Check the table cell (not raw page: the search box echoes the query).
+    content = client.get(reverse("inventory:product-list")).content.decode()
+    assert "<td>Cola</td>" not in content
+    # Name search and category filter (billing-style search) also hide it.
+    assert "<td>Cola</td>" not in client.get(reverse("inventory:product-list") + "?q=Cola").content.decode()
+    assert (
+        "<td>Cola</td>"
+        not in client.get(reverse("inventory:product-list") + f"?category={category.id}").content.decode()
+    )
+
+
+@pytest.mark.django_db
+def test_active_manager_excludes_inactive(category, product):
+    # Billing product search must use Product.objects.active().
+    assert product.name in [p.name for p in Product.objects.active()]
+    product.is_active = False
+    product.save(update_fields=["is_active", "updated_at"])
+    assert product.name not in [p.name for p in Product.objects.active()]
+    # Full history still queryable via the default manager.
+    assert Product.objects.filter(pk=product.pk).exists()

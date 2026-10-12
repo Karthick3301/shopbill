@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.db.models import ProtectedError
+from django.db.models import Count, ProtectedError, Q
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
@@ -21,13 +21,15 @@ class CategoryListView(RoleRequiredMixin, ListView):
     template_name = "inventory/category_list.html"
     allowed_roles = VIEWER_ROLES
     paginate_by = 25
+    ordering = ["name"]
 
     def get_queryset(self):
         qs = super().get_queryset()
         q = self.request.GET.get("q", "").strip()
         if q:
             qs = qs.filter(name__icontains=q)
-        return qs
+        # Show active product counts; inactive rows stay hidden from lists.
+        return qs.annotate(active_count=Count("products", filter=Q(products__is_active=True)))
 
 
 class CategoryCreateView(OwnerRequiredMixin, CreateView):
@@ -67,7 +69,9 @@ class ProductListView(RoleRequiredMixin, ListView):
     paginate_by = 25
 
     def get_queryset(self):
-        qs = super().get_queryset().select_related("category")
+        # Hide deactivated products from the list (history rows are kept).
+        # Billing product search must use this same filter: Product.objects.active().
+        qs = super().get_queryset().select_related("category").filter(is_active=True)
         q = self.request.GET.get("q", "").strip()
         if q:
             qs = qs.filter(name__icontains=q)
@@ -100,6 +104,15 @@ class ProductUpdateView(OwnerRequiredMixin, UpdateView):
 
 
 class ProductDeleteView(OwnerRequiredMixin, DeleteView):
+    """Soft delete: set is_active=False so history (StockMovement) is kept."""
+
     model = Product
     template_name = "inventory/product_confirm_delete.html"
     success_url = reverse_lazy("inventory:product-list")
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        # Deactivating never changes stock, so save() logs no movement.
+        self.object.is_active = False
+        self.object.save(update_fields=["is_active", "updated_at"])
+        return redirect(self.get_success_url())

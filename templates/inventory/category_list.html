@@ -19,12 +19,12 @@
 
 <div class="table-responsive">
 <table class="table table-striped align-middle">
-  <thead><tr><th>Name</th><th>Products</th><th></th></tr></thead>
+  <thead><tr><th>Name</th><th>Products (active)</th><th></th></tr></thead>
   <tbody>
     {% for c in object_list %}
       <tr>
         <td>{{ c.name }}</td>
-        <td>{{ c.products.count }}</td>
+        <td>{{ c.active_count }}</td>
         <td class="text-end">
           {% if user.is_owner %}
             <a class="btn btn-sm btn-outline-secondary" href="{% url 'inventory:category-edit' c.pk %}">Edit</a>

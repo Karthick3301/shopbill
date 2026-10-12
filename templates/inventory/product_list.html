@@ -48,7 +48,7 @@
         <td class="text-end">
           {% if user.is_owner %}
             <a class="btn btn-sm btn-outline-secondary" href="{% url 'inventory:product-edit' p.pk %}">Edit</a>
-            <a class="btn btn-sm btn-outline-danger" href="{% url 'inventory:product-delete' p.pk %}">Delete</a>
+            <a class="btn btn-sm btn-outline-danger" href="{% url 'inventory:product-delete' p.pk %}">Deactivate</a>
           {% endif %}
         </td>
       </tr>

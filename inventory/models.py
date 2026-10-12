@@ -14,6 +14,14 @@ class Category(models.Model):
         return self.name
 
 
+class ProductQuerySet(models.QuerySet):
+    """Reusable filters for products."""
+
+    def active(self):
+        """Only products visible in lists and billing search."""
+        return self.filter(is_active=True)
+
+
 class Product(models.Model):
     """Sellable item with price and stock level."""
 
@@ -28,8 +36,13 @@ class Product(models.Model):
     )
     stock = models.PositiveIntegerField(default=0)
     low_stock_limit = models.PositiveIntegerField(default=5)
+    # Soft delete flag: deactivated products stay in the DB (history kept)
+    # but are hidden from lists and billing search.
+    is_active = models.BooleanField(default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = ProductQuerySet.as_manager()
 
     class Meta:
         ordering = ["name"]
