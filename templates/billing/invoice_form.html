@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}New invoice - ShopBill{% endblock %}
+{% block content %}
+<h1>New invoice</h1>
+<form method="post" id="invoice-form" class="row g-3">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <div class="col-12 col-md-4">
+    <label class="form-label" for="{{ form.customer.id_for_label }}">Customer</label>
+    {{ form.customer }}
+    {{ form.customer.errors }}
+  </div>
+  <div class="col-6 col-md-2">
+    <label class="form-label" for="{{ form.tax.id_for_label }}">Tax</label>
+    {{ form.tax }}
+    {{ form.tax.errors }}
+  </div>
+  <div class="col-6 col-md-2">
+    <label class="form-label" for="{{ form.discount.id_for_label }}">Discount</label>
+    {{ form.discount }}
+    {{ form.discount.errors }}
+  </div>
+  {{ form.items_json }}
+  {{ form.items_json.errors }}
+
+  <div class="col-12">
+    <label class="form-label" for="product-search">Search product (active only)</label>
+    <input class="form-control" id="product-search" type="search" placeholder="Type product name" autocomplete="off">
+    <div id="search-results" class="list-group mt-1"></div>
+  </div>
+
+  <div class="col-12">
+    <div class="table-responsive">
+    <table class="table table-striped align-middle" id="cart-table">
+      <thead><tr><th>Product</th><th>Price</th><th>Qty</th><th class="text-end">Amount</th><th></th></tr></thead>
+      <tbody id="cart-body">
+        <tr id="cart-empty"><td colspan="5" class="text-center text-muted">Cart is empty.</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="text-end">Subtotal: <strong id="cart-subtotal">0.00</strong><br>
+    Total (subtotal + tax - discount): <strong id="cart-total">0.00</strong></p>
+  </div>
+
+  <div class="col-12">
+    <button class="btn btn-primary" type="submit">Save invoice</button>
+    <a class="btn btn-link" href="{% url 'billing:invoice-list' %}">Cancel</a>
+  </div>
+</form>
+
+<script>
+// Vanilla-JS live cart: search -> add -> qty/discount/tax -> running total.
+const cart = {};  // productId -> {id, name, price, stock, qty}
+const searchInput = document.getElementById("product-search");
+const searchResults = document.getElementById("search-results");
+const cartBody = document.getElementById("cart-body");
+const cartEmpty = document.getElementById("cart-empty");
+const subtotalEl = document.getElementById("cart-subtotal");
+const totalEl = document.getElementById("cart-total");
+const taxInput = document.getElementById("{{ form.tax.id_for_label }}");
+const discountInput = document.getElementById("{{ form.discount.id_for_label }}");
+const itemsInput = document.getElementById("{{ form.items_json.id_for_label }}");
+const searchUrl = "{% url 'billing:product-search' %}";
+let searchTimer = null;
+
+function money(n) { return (Math.round(n * 100) / 100).toFixed(2); }
+
+function recalc() {
+  let subtotal = 0;
+  for (const id in cart) subtotal += cart[id].price * cart[id].qty;
+  const tax = parseFloat(taxInput.value) || 0;
+  const discount = parseFloat(discountInput.value) || 0;
+  subtotalEl.textContent = money(subtotal);
+  totalEl.textContent = money(Math.max(0, subtotal + tax - discount));
+}
+
+function renderCart() {
+  cartBody.querySelectorAll("tr[data-pid]").forEach((r) => r.remove());
+  const ids = Object.keys(cart);
+  cartEmpty.style.display = ids.length ? "none" : "";
+  for (const id of ids) {
+    const row = cart[id];
+    const tr = document.createElement("tr");
+    tr.dataset.pid = id;
+    tr.innerHTML =
+      "<td>" + row.name + " <small class='text-muted'>(stock " + row.stock + ")</small></td>" +
+      "<td>" + money(row.price) + "</td>" +
+      "<td><input type='number' min='1' max='" + row.stock + "' value='" + row.qty +
+      "' class='form-control form-control-sm' style='width:90px'></td>" +
+      "<td class='text-end'>" + money(row.price * row.qty) + "</td>" +
+      "<td class='text-end'><button type='button' class='btn btn-sm btn-outline-danger'>Remove</button></td>";
+    tr.querySelector("input").addEventListener("input", (e) => {
+      row.qty = Math.max(1, parseInt(e.target.value) || 1);
+      renderCart();
+    });
+    tr.querySelector("button").addEventListener("click", () => {
+      delete cart[id];
+      renderCart();
+    });
+    cartBody.appendChild(tr);
+  }
+  recalc();
+}
+
+searchInput.addEventListener("input", () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(async () => {
+    const q = searchInput.value.trim();
+    searchResults.innerHTML = "";
+    if (!q) return;
+    const resp = await fetch(searchUrl + "?q=" + encodeURIComponent(q));
+    const data = await resp.json();
+    for (const p of data.results) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "list-group-item list-group-item-action";
+      b.textContent = p.name + " - " + p.price + " (stock " + p.stock + ")";
+      b.addEventListener("click", () => {
+        if (cart[p.id]) cart[p.id].qty += 1;
+        else cart[p.id] = { id: p.id, name: p.name, price: parseFloat(p.price), stock: p.stock, qty: 1 };
+        searchResults.innerHTML = "";
+        searchInput.value = "";
+        renderCart();
+      });
+      searchResults.appendChild(b);
+    }
+  }, 200);
+});
+
+taxInput.addEventListener("input", recalc);
+discountInput.addEventListener("input", recalc);
+
+document.getElementById("invoice-form").addEventListener("submit", (e) => {
+  const lines = Object.values(cart).map((r) => ({
+    product_id: r.id, quantity: r.qty, unit_price: r.price,
+  }));
+  itemsInput.value = JSON.stringify(lines);
+  if (!lines.length) {
+    e.preventDefault();
+    alert("Add at least one item to the invoice.");
+  }
+});
+recalc();
+</script>
+{% endblock %}

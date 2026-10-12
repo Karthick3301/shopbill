@@ -20,7 +20,8 @@
           {# Staff can view products and bill; Owner sees everything. #}
           <li class="nav-item"><a class="nav-link" href="{% url 'inventory:product-list' %}">Products</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'inventory:category-list' %}">Categories</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Billing</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'billing:invoice-list' %}">Billing</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'billing:customer-list' %}">Customers</a></li>
           {% if user.is_owner %}
             <li class="nav-item"><a class="nav-link" href="#">Reports</a></li>
             <li class="nav-item"><a class="nav-link" href="/admin/">Admin</a></li>

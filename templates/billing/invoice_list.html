@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Invoices - ShopBill{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Invoices</h1>
+  <a class="btn btn-primary" href="{% url 'billing:invoice-create' %}">New invoice</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-12 col-md-6">
+    <input class="form-control" type="search" name="q" value="{{ request.GET.q }}" placeholder="Search by customer">
+  </div>
+  <div class="col-12 col-md-3">
+    <button class="btn btn-outline-primary w-100" type="submit">Search</button>
+  </div>
+</form>
+
+<div class="table-responsive">
+<table class="table table-striped align-middle">
+  <thead><tr><th>#</th><th>Customer</th><th>Date</th><th>Total</th><th></th></tr></thead>
+  <tbody>
+    {% for inv in object_list %}
+      <tr>
+        <td>{{ inv.pk }}</td>
+        <td>{{ inv.customer.name }}</td>
+        <td>{{ inv.created_at|date:"Y-m-d H:i" }}</td>
+        <td>{{ inv.total }}</td>
+        <td class="text-end">
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'billing:invoice-detail' inv.pk %}">View</a>
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'billing:invoice-pdf' inv.pk %}">PDF</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="text-center text-muted">No invoices yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+{% if is_paginated %}
+<nav><ul class="pagination">
+  {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}">Previous</a></li>{% endif %}
+  <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+  {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}
