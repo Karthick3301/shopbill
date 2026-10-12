@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Home - ShopBill{% endblock %}
+{% block content %}
+<div class="p-4 bg-light rounded-3">
+  <h1>ShopBill</h1>
+  {% if user.is_authenticated %}
+    <p>Welcome, {{ user.username }}! You are logged in as <strong>{{ user.get_role_display }}</strong>.</p>
+    <ul>
+      <li>Products: visible to Owner and Staff.</li>
+      <li>Billing: visible to Owner and Staff.</li>
+      {% if user.is_owner %}
+        <li>Reports and Admin: Owner only.</li>
+      {% endif %}
+    </ul>
+  {% else %}
+    <p>Billing and inventory for a small retail shop.</p>
+    <a class="btn btn-primary" href="{% url 'login' %}">Login</a>
+    <p class="mt-2 text-muted">Demo accounts (after running the demo command): owner/demo123, staff/demo123.</p>
+  {% endif %}
+</div>
+{% endblock %}
