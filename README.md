@@ -80,10 +80,10 @@ but not a superuser.)
 
 1. Push this repo to GitHub. No secrets are committed (`.env` and
    `db.sqlite3` are gitignored).
-2. Create a Render **PostgreSQL** database and a **Web Service** from the
-   repo with build command `bash build.sh` (installs deps, runs
-   `collectstatic` and `migrate`, then seeds demo data only when
-   `SEED_DEMO_DATA=true`).
+2. Create a free PostgreSQL database (the live demo uses a Neon free-tier
+   Postgres) and a Render free **Web Service** from the repo with build
+   command `bash build.sh` (installs deps, runs `collectstatic` and
+   `migrate`, then seeds demo data only when `SEED_DEMO_DATA=true`).
 3. Set the Render start command to:
    `gunicorn config.wsgi:application --bind 0.0.0.0:$PORT`
 4. Set these environment variables on the web service:
@@ -94,21 +94,22 @@ but not a superuser.)
    | `DJANGO_SECRET_KEY` | _(generate a fresh one)_ | Required; never commit it. |
    | `DJANGO_ALLOWED_HOSTS` | `<app>.onrender.com` | Your Render domain. |
    | `CSRF_TRUSTED_ORIGINS` | `https://<app>.onrender.com` | Needed for login/forms over HTTPS. |
-   | `DATABASE_URL` | _(Render provides this)_ | Set automatically when the database is linked. |
+   | `DATABASE_URL` | _(Render provides this)_ | Points at any Postgres (e.g. Neon); set automatically when a Render database is linked. |
    | `SEED_DEMO_DATA` | `true` | Optional: seeds demo users/catalog/invoices during the build. |
    | `PYTHON_VERSION` | `3.13` | Pins the Python version Render builds with. |
 
 With `DEBUG=False` the app forces HTTPS (behind Render's proxy header),
 uses secure cookies, and enables HSTS.
 
-Notes on Render's free tier: a free PostgreSQL database expires after
-about 30 days (back up anything you need), and the first request after
-the service idles takes about a minute while it spins back up.
+Notes on free hosting: the demo database is a Neon free-tier Postgres —
+any Postgres works through `DATABASE_URL` (a free Render database would
+expire after about 30 days). The first request after the web service idles
+takes about a minute while it spins back up.
 
 With `DEBUG=False` the app forces HTTPS (behind Render's proxy header),
 uses secure cookies, and enables HSTS.
 
-## Screenshots / live link
+## Live demo
 
 Live demo: https://shopbill-nf41.onrender.com (login owner/demo123 or
 staff/demo123; free hosting, so the first load after idle can take about a
