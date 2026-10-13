@@ -110,5 +110,17 @@ uses secure cookies, and enables HSTS.
 
 ## Screenshots / live link
 
-- Live app: _TODO — paste the Render URL here._
-- Screenshots: _TODO — add dashboard, billing, and invoice-page shots here._
+Live demo: https://shopbill-nf41.onrender.com (login owner/demo123 or
+staff/demo123; free hosting, so the first load after idle can take about a
+minute).
+
+## Screenshots
+
+![Sales dashboard with daily and monthly charts](docs/screenshots/dashboard.png)
+*Owner dashboard: today's and monthly sales, daily/monthly charts, top products.*
+
+![Invoice list](docs/screenshots/invoices.png)
+*Billing: invoice list with PDF download.*
+
+![Product list with low-stock highlighting](docs/screenshots/products.png)
+*Products: search, category filter, and low-stock highlighting.*
