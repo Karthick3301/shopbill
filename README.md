@@ -106,9 +106,6 @@ any Postgres works through `DATABASE_URL` (a free Render database would
 expire after about 30 days). The first request after the web service idles
 takes about a minute while it spins back up.
 
-With `DEBUG=False` the app forces HTTPS (behind Render's proxy header),
-uses secure cookies, and enables HSTS.
-
 ## Live demo
 
 Live demo: https://shopbill-nf41.onrender.com (login owner/demo123 or
