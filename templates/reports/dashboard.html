@@ -5,25 +5,31 @@
 
 <div class="row g-3 mb-3">
   <div class="col-12 col-md-4">
-    <div class="card"><div class="card-body">
-      <h2 class="h6 text-muted">Today's sales</h2>
-      <p class="fs-4 mb-0">₹{{ today_total|floatformat:2 }}</p>
-      <p class="text-muted mb-0">{{ today_count }} invoice(s)</p>
+    <div class="card stat-card"><div class="card-body d-flex align-items-center gap-3">
+      <span class="stat-icon" aria-hidden="true"><i class="bi bi-calendar-day"></i></span>
+      <div>
+        <h2 class="h6 text-muted mb-1">Today's sales</h2>
+        <p class="fs-4 mb-0">₹{{ today_total|floatformat:2 }}</p>
+        <p class="text-muted mb-0 small">{{ today_count }} invoice(s)</p>
+      </div>
+    </div></div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="card stat-card"><div class="card-body d-flex align-items-center gap-3">
+      <span class="stat-icon" aria-hidden="true"><i class="bi bi-calendar-month"></i></span>
+      <div>
+        <h2 class="h6 text-muted mb-1">This month's sales</h2>
+        <p class="fs-4 mb-0">₹{{ month_total|floatformat:2 }}</p>
+      </div>
     </div></div>
   </div>
   <div class="col-12 col-md-4">
     <div class="card"><div class="card-body">
-      <h2 class="h6 text-muted">This month's sales</h2>
-      <p class="fs-4 mb-0">₹{{ month_total|floatformat:2 }}</p>
-    </div></div>
-  </div>
-  <div class="col-12 col-md-4">
-    <div class="card"><div class="card-body">
-      <h2 class="h6 text-muted">Export sales (CSV)</h2>
+      <h2 class="h6 card-heading"><i class="bi bi-download me-1" aria-hidden="true"></i>Export sales (CSV)</h2>
       <form method="get" action="{% url 'reports:sales-csv' %}" class="row g-2">
         <div class="col-6"><input class="form-control" type="date" name="from" aria-label="From date"></div>
         <div class="col-6"><input class="form-control" type="date" name="to" aria-label="To date"></div>
-        <div class="col-12"><button class="btn btn-outline-primary w-100" type="submit">Download CSV</button></div>
+        <div class="col-12"><button class="btn btn-outline-primary w-100" type="submit"><i class="bi bi-file-earmark-spreadsheet me-1" aria-hidden="true"></i>Download CSV</button></div>
       </form>
     </div></div>
   </div>
@@ -32,13 +38,13 @@
 <div class="row g-3 mb-3">
   <div class="col-12 col-lg-6">
     <div class="card"><div class="card-body">
-      <h2 class="h6">Daily sales (current month)</h2>
+      <h2 class="h6 card-heading"><i class="bi bi-bar-chart me-1" aria-hidden="true"></i>Daily sales (current month)</h2>
       <canvas id="daily-chart"></canvas>
     </div></div>
   </div>
   <div class="col-12 col-lg-6">
     <div class="card"><div class="card-body">
-      <h2 class="h6">Monthly sales (last 6 months)</h2>
+      <h2 class="h6 card-heading"><i class="bi bi-graph-up me-1" aria-hidden="true"></i>Monthly sales (last 6 months)</h2>
       <canvas id="monthly-chart"></canvas>
     </div></div>
   </div>
@@ -47,7 +53,7 @@
 <div class="row g-3">
   <div class="col-12 col-lg-6">
     <div class="card"><div class="card-body">
-      <h2 class="h6">Top 5 products by quantity</h2>
+      <h2 class="h6 card-heading"><i class="bi bi-trophy me-1" aria-hidden="true"></i>Top 5 products by quantity</h2>
       <div class="table-responsive"><table class="table table-sm">
         <thead><tr><th>Product</th><th class="text-end">Qty</th></tr></thead>
         <tbody>
@@ -62,12 +68,12 @@
   </div>
   <div class="col-12 col-lg-6">
     <div class="card"><div class="card-body">
-      <h2 class="h6">Low stock (active products)</h2>
+      <h2 class="h6 card-heading"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>Low stock (active products)</h2>
       <div class="table-responsive"><table class="table table-sm">
         <thead><tr><th>Product</th><th class="text-end">Stock</th><th class="text-end">Limit</th></tr></thead>
         <tbody>
           {% for p in low_stock %}
-            <tr class="table-warning"><td>{{ p.name }}</td><td class="text-end">{{ p.stock }}</td><td class="text-end">{{ p.low_stock_limit }}</td></tr>
+            <tr class="table-warning"><td>{{ p.name }} <span class="badge text-bg-warning ms-1">Low</span></td><td class="text-end">{{ p.stock }}</td><td class="text-end">{{ p.low_stock_limit }}</td></tr>
           {% empty %}
             <tr><td colspan="3" class="text-muted">All stocked up.</td></tr>
           {% endfor %}
@@ -89,12 +95,12 @@ const monthlyLabels = JSON.parse(document.getElementById("monthly-labels").textC
 const monthlyData = JSON.parse(document.getElementById("monthly-data").textContent);
 new Chart(document.getElementById("daily-chart"), {
   type: "bar",
-  data: { labels: dailyLabels, datasets: [{ label: "Sales", data: dailyData }] },
+  data: { labels: dailyLabels, datasets: [{ label: "Sales", data: dailyData, backgroundColor: "#0F766E", borderColor: "#0F766E", borderWidth: 1 }] },
   options: { responsive: true, scales: { y: { beginAtZero: true } } },
 });
 new Chart(document.getElementById("monthly-chart"), {
   type: "line",
-  data: { labels: monthlyLabels, datasets: [{ label: "Sales", data: monthlyData }] },
+  data: { labels: monthlyLabels, datasets: [{ label: "Sales", data: monthlyData, borderColor: "#0F766E", backgroundColor: "rgba(15, 118, 110, 0.15)", fill: true, tension: 0.3, pointBackgroundColor: "#0F766E", pointBorderColor: "#0F766E" }] },
   options: { responsive: true, scales: { y: { beginAtZero: true } } },
 });
 </script>

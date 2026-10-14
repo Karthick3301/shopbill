@@ -303,3 +303,116 @@ main.container {
   outline: 2px solid #0F766E;
   outline-offset: 2px;
 }
+
+/* ---------- Design pass 2: home, login, reports, errors ---------- */
+.hero-card {
+  background-color: var(--sb-card);
+  border: 1px solid var(--sb-border);
+  border-radius: var(--sb-radius);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.hero-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background-color: #0F766E;
+  color: #fff;
+  font-size: 1.4rem;
+}
+
+.quick-card {
+  transition: box-shadow 0.15s ease-in-out, transform 0.15s ease-in-out;
+}
+
+.quick-card:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+  transform: translateY(-1px);
+}
+
+.quick-card h2 {
+  color: var(--sb-text);
+}
+
+.quick-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background-color: rgba(15, 118, 110, 0.1);
+  color: #0F766E;
+  font-size: 1.25rem;
+}
+
+.stat-card .fs-4 {
+  font-weight: 700;
+}
+
+.stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background-color: rgba(15, 118, 110, 0.1);
+  color: #0F766E;
+  font-size: 1.25rem;
+}
+
+.stat-icon-warning {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #B45309;
+}
+
+.card-heading {
+  display: flex;
+  align-items: center;
+  color: var(--sb-text);
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.card-heading .bi {
+  color: #0F766E;
+}
+
+.login-card {
+  margin-top: 1.5rem;
+}
+
+.login-brand-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.9rem;
+  background-color: #0F172A;
+  color: #5EEAD4;
+  font-size: 1.6rem;
+}
+
+.error-card {
+  margin-top: 1.5rem;
+}
+
+.error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: rgba(15, 118, 110, 0.1);
+  color: #0F766E;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}

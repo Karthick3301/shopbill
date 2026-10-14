@@ -1,21 +1,118 @@
 {% extends "base.html" %}
 {% block title %}Home - ShopBill{% endblock %}
 {% block content %}
-<div class="p-4 bg-light rounded-3">
-  <h1>ShopBill</h1>
-  {% if user.is_authenticated %}
-    <p>Welcome, {{ user.username }}! You are logged in as <strong>{{ user.get_role_display }}</strong>.</p>
-    <ul>
-      <li>Products: visible to Owner and Staff.</li>
-      <li>Billing: visible to Owner and Staff.</li>
-      {% if user.is_owner %}
-        <li>Reports and Admin: Owner only.</li>
-      {% endif %}
-    </ul>
-  {% else %}
-    <p>Billing and inventory for a small retail shop.</p>
-    <a class="btn btn-primary" href="{% url 'login' %}">Login</a>
-    <p class="mt-2 text-muted">Demo accounts: owner/demo123, staff/demo123.</p>
+{% if user.is_authenticated %}
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <div>
+      <h1 class="mb-0">Welcome, {{ user.username }}!</h1>
+      <p class="text-muted mb-0">You are logged in as <span class="badge text-bg-secondary role-badge">{{ user.get_role_display }}</span></p>
+    </div>
+  </div>
+
+  {% if user.is_owner %}
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-md-4">
+      <div class="card stat-card"><div class="card-body d-flex align-items-center gap-3">
+        <span class="stat-icon" aria-hidden="true"><i class="bi bi-calendar-day"></i></span>
+        <div>
+          <h2 class="h6 text-muted mb-1">Today's sales</h2>
+          <p class="fs-4 mb-0">₹{{ today_total|floatformat:2 }}</p>
+          <p class="text-muted mb-0 small">{{ today_count }} invoice(s)</p>
+        </div>
+      </div></div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="card stat-card"><div class="card-body d-flex align-items-center gap-3">
+        <span class="stat-icon" aria-hidden="true"><i class="bi bi-calendar-month"></i></span>
+        <div>
+          <h2 class="h6 text-muted mb-1">This month's sales</h2>
+          <p class="fs-4 mb-0">₹{{ month_total|floatformat:2 }}</p>
+        </div>
+      </div></div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="card stat-card"><div class="card-body d-flex align-items-center gap-3">
+        <span class="stat-icon stat-icon-warning" aria-hidden="true"><i class="bi bi-exclamation-triangle"></i></span>
+        <div>
+          <h2 class="h6 text-muted mb-1">Low-stock products</h2>
+          <p class="fs-4 mb-0">{{ low_stock_count }}</p>
+          <p class="text-muted mb-0 small">need restocking</p>
+        </div>
+      </div></div>
+    </div>
+  </div>
   {% endif %}
-</div>
+
+  <div class="row g-3">
+    <div class="col-12 col-md-6 col-lg-4">
+      <a class="card quick-card h-100 text-decoration-none" href="{% url 'billing:invoice-create' %}">
+        <div class="card-body d-flex gap-3">
+          <span class="quick-icon" aria-hidden="true"><i class="bi bi-receipt"></i></span>
+          <div>
+            <h2 class="h6 mb-1">New invoice</h2>
+            <p class="text-muted mb-0 small">Bill a customer and update stock.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% if user.is_owner %}
+    <div class="col-12 col-md-6 col-lg-4">
+      <a class="card quick-card h-100 text-decoration-none" href="{% url 'inventory:product-add' %}">
+        <div class="card-body d-flex gap-3">
+          <span class="quick-icon" aria-hidden="true"><i class="bi bi-plus-circle"></i></span>
+          <div>
+            <h2 class="h6 mb-1">Add product</h2>
+            <p class="text-muted mb-0 small">Add a new item to your inventory.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endif %}
+    <div class="col-12 col-md-6 col-lg-4">
+      <a class="card quick-card h-100 text-decoration-none" href="{% url 'inventory:product-list' %}">
+        <div class="card-body d-flex gap-3">
+          <span class="quick-icon" aria-hidden="true"><i class="bi bi-box-seam"></i></span>
+          <div>
+            <h2 class="h6 mb-1">Products</h2>
+            <p class="text-muted mb-0 small">Browse and search your inventory.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+      <a class="card quick-card h-100 text-decoration-none" href="{% url 'billing:customer-list' %}">
+        <div class="card-body d-flex gap-3">
+          <span class="quick-icon" aria-hidden="true"><i class="bi bi-people"></i></span>
+          <div>
+            <h2 class="h6 mb-1">Customers</h2>
+            <p class="text-muted mb-0 small">Manage your customer records.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% if user.is_owner %}
+    <div class="col-12 col-md-6 col-lg-4">
+      <a class="card quick-card h-100 text-decoration-none" href="{% url 'reports:dashboard' %}">
+        <div class="card-body d-flex gap-3">
+          <span class="quick-icon" aria-hidden="true"><i class="bi bi-bar-chart-line"></i></span>
+          <div>
+            <h2 class="h6 mb-1">Reports</h2>
+            <p class="text-muted mb-0 small">See sales trends and low stock.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+{% else %}
+  <div class="hero-card p-4 p-md-5 rounded-3">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <span class="hero-icon" aria-hidden="true"><i class="bi bi-receipt-cutoff"></i></span>
+      <h1 class="mb-0">ShopBill</h1>
+    </div>
+    <p class="lead mb-3">Simple billing and inventory for your retail shop.</p>
+    <a class="btn btn-primary" href="{% url 'login' %}"><i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>Login</a>
+    <p class="mt-3 mb-0 text-muted small">Demo accounts: owner/demo123, staff/demo123.</p>
+  </div>
+{% endif %}
 {% endblock %}

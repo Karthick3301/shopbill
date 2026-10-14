@@ -1,9 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Not found - ShopBill{% endblock %}
 {% block content %}
-<div class="text-center py-5">
-  <h1 class="display-4">404</h1>
-  <p class="lead">That page doesn't exist.</p>
-  <a class="btn btn-primary" href="{% url 'home' %}">Back to home</a>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-6">
+    <div class="card error-card"><div class="card-body text-center py-5">
+      <span class="error-icon" aria-hidden="true"><i class="bi bi-search"></i></span>
+      <h1 class="display-4">404</h1>
+      <p class="lead">That page doesn't exist.</p>
+      <p class="text-muted">Check the address or return to the home page.</p>
+      <a class="btn btn-primary" href="{% url 'home' %}"><i class="bi bi-house me-1" aria-hidden="true"></i>Back to home</a>
+    </div></div>
+  </div>
 </div>
 {% endblock %}
