@@ -113,6 +113,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"  # collectstatic target for Render
+STATICFILES_DIRS = [BASE_DIR / "static"]  # project static (css/app.css, favicon)
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},

@@ -3,14 +3,14 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h1>Invoice #{{ object.pk }}</h1>
-  <a class="btn btn-primary" href="{% url 'billing:invoice-pdf' object.pk %}">Download PDF</a>
+  <a class="btn btn-primary" href="{% url 'billing:invoice-pdf' object.pk %}"><i class="bi bi-file-earmark-pdf me-1" aria-hidden="true"></i>Download PDF</a>
 </div>
 <p class="text-muted">Customer: <strong>{{ object.customer.name }}</strong> |
    Date: {{ object.created_at|date:"Y-m-d H:i" }} |
    Billed by: {{ object.created_by|default:"-" }}</p>
 
 <div class="table-responsive">
-<table class="table table-striped align-middle">
+<table class="table table-striped table-hover align-middle">
   <thead><tr><th>Product</th><th class="text-end">Qty</th><th class="text-end">Unit price</th><th class="text-end">Amount</th></tr></thead>
   <tbody>
     {% for item in object.items.all %}

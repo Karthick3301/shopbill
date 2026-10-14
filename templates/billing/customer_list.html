@@ -3,7 +3,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h1>Customers</h1>
-  <a class="btn btn-primary" href="{% url 'billing:customer-add' %}">Add customer</a>
+  <a class="btn btn-primary" href="{% url 'billing:customer-add' %}"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add customer</a>
 </div>
 
 <form method="get" class="row g-2 mb-3">
@@ -16,7 +16,7 @@
 </form>
 
 <div class="table-responsive">
-<table class="table table-striped align-middle">
+<table class="table table-striped table-hover align-middle">
   <thead><tr><th>Name</th><th>Phone</th><th></th></tr></thead>
   <tbody>
     {% for c in object_list %}
@@ -24,9 +24,9 @@
         <td>{{ c.name }}</td>
         <td>{{ c.phone|default:"-" }}</td>
         <td class="text-end">
-          <a class="btn btn-sm btn-outline-secondary" href="{% url 'billing:customer-edit' c.pk %}">Edit</a>
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'billing:customer-edit' c.pk %}"><i class="bi bi-pencil me-1" aria-hidden="true"></i>Edit</a>
           {% if user.is_owner %}
-            <a class="btn btn-sm btn-outline-danger" href="{% url 'billing:customer-delete' c.pk %}">Delete</a>
+            <a class="btn btn-sm btn-outline-danger" href="{% url 'billing:customer-delete' c.pk %}"><i class="bi bi-trash me-1" aria-hidden="true"></i>Delete</a>
           {% endif %}
         </td>
       </tr>
