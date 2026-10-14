@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Customers - ShopBill{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h1>Customers</h1>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <h1 class="mb-0">Customers</h1>
   <a class="btn btn-primary" href="{% url 'billing:customer-add' %}"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add customer</a>
 </div>
 
@@ -31,7 +31,10 @@
         </td>
       </tr>
     {% empty %}
-      <tr><td colspan="3" class="text-center text-muted">No customers found.</td></tr>
+      <tr><td colspan="3"><div class="empty-state">
+        <p class="mb-2 text-muted">No customers found. Add your first customer to get started.</p>
+        <a class="btn btn-primary btn-sm" href="{% url 'billing:customer-add' %}"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add customer</a>
+      </div></td></tr>
     {% endfor %}
   </tbody>
 </table>

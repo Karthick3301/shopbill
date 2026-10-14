@@ -4,47 +4,61 @@
 <h1>New invoice</h1>
 <form method="post" id="invoice-form" class="row g-3">
   {% csrf_token %}
-  {{ form.non_field_errors }}
-  <div class="col-12 col-md-4">
-    <label class="form-label" for="{{ form.customer.id_for_label }}">Customer</label>
-    {{ form.customer }}
-    {{ form.customer.errors }}
-  </div>
-  <div class="col-6 col-md-2">
-    <label class="form-label" for="{{ form.tax.id_for_label }}">Tax</label>
-    {{ form.tax }}
-    {{ form.tax.errors }}
-  </div>
-  <div class="col-6 col-md-2">
-    <label class="form-label" for="{{ form.discount.id_for_label }}">Discount</label>
-    {{ form.discount }}
-    {{ form.discount.errors }}
+  <div class="col-12">
+    {{ form.non_field_errors }}
   </div>
   {{ form.items_json }}
   {{ form.items_json.errors }}
 
-  <div class="col-12">
-    <label class="form-label" for="product-search">Search product (active only)</label>
-    <input class="form-control" id="product-search" type="search" placeholder="Type product name" autocomplete="off">
-    <div id="search-results" class="list-group mt-1"></div>
+  <div class="col-12 col-lg-8">
+    <div class="card mb-3"><div class="card-body">
+      <h2 class="h6 card-heading"><i class="bi bi-person me-1" aria-hidden="true"></i>Customer</h2>
+      <label class="form-label" for="{{ form.customer.id_for_label }}">Customer</label>
+      {{ form.customer }}
+      {{ form.customer.errors }}
+    </div></div>
+
+    <div class="card mb-3"><div class="card-body">
+      <h2 class="h6 card-heading"><i class="bi bi-search me-1" aria-hidden="true"></i>Products</h2>
+      <label class="form-label" for="product-search">Search product (active only)</label>
+      <input class="form-control" id="product-search" type="search" placeholder="Type product name" autocomplete="off">
+      <div id="search-results" class="list-group mt-1"></div>
+    </div></div>
+
+    <div class="card"><div class="card-body">
+      <h2 class="h6 card-heading"><i class="bi bi-cart me-1" aria-hidden="true"></i>Cart</h2>
+      <div class="table-responsive">
+      <table class="table table-striped align-middle" id="cart-table">
+        <thead><tr><th>Product</th><th>Price</th><th>Qty</th><th class="text-end">Amount</th><th></th></tr></thead>
+        <tbody id="cart-body">
+          <tr id="cart-empty"><td colspan="5" class="text-center text-muted">Cart is empty.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div></div>
   </div>
 
-  <div class="col-12">
-    <div class="table-responsive">
-    <table class="table table-striped align-middle" id="cart-table">
-      <thead><tr><th>Product</th><th>Price</th><th>Qty</th><th class="text-end">Amount</th><th></th></tr></thead>
-      <tbody id="cart-body">
-        <tr id="cart-empty"><td colspan="5" class="text-center text-muted">Cart is empty.</td></tr>
-      </tbody>
-    </table>
-    </div>
-    <p class="text-end">Subtotal: <strong id="cart-subtotal">0.00</strong><br>
-    Total (subtotal + tax - discount): <strong id="cart-total">0.00</strong></p>
-  </div>
-
-  <div class="col-12">
-    <button class="btn btn-primary" type="submit">Save invoice</button>
-    <a class="btn btn-link" href="{% url 'billing:invoice-list' %}">Cancel</a>
+  <div class="col-12 col-lg-4">
+    <div class="card invoice-summary"><div class="card-body">
+      <h2 class="h6 card-heading"><i class="bi bi-receipt me-1" aria-hidden="true"></i>Summary</h2>
+      <dl class="summary-rows mb-3">
+        <div class="summary-row"><dt>Subtotal</dt><dd class="text-end">₹<strong id="cart-subtotal">0.00</strong></dd></div>
+        <div class="summary-row">
+          <dt><label class="form-label mb-0" for="{{ form.tax.id_for_label }}">Tax</label></dt>
+          <dd>{{ form.tax }}{{ form.tax.errors }}</dd>
+        </div>
+        <div class="summary-row">
+          <dt><label class="form-label mb-0" for="{{ form.discount.id_for_label }}">Discount</label></dt>
+          <dd>{{ form.discount }}{{ form.discount.errors }}</dd>
+        </div>
+        <div class="summary-row summary-total"><dt>Total</dt><dd class="text-end">₹<strong id="cart-total">0.00</strong></dd></div>
+      </dl>
+      <p class="text-muted small">Total = subtotal + tax − discount.</p>
+      <div class="d-grid gap-2">
+        <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1" aria-hidden="true"></i>Save invoice</button>
+        <a class="btn btn-link" href="{% url 'billing:invoice-list' %}">Cancel</a>
+      </div>
+    </div></div>
   </div>
 </form>
 

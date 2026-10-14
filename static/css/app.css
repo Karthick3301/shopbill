@@ -416,3 +416,187 @@ main.container {
   font-size: 1.5rem;
   margin-bottom: 0.75rem;
 }
+
+/* ---------- Design pass 3: invoice flow, bill, empty states, mobile ---------- */
+.invoice-summary {
+  position: sticky;
+  top: 1rem;
+}
+
+.summary-rows {
+  margin-bottom: 0;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px dashed var(--sb-border);
+}
+
+.summary-row dt {
+  font-weight: 500;
+  color: var(--sb-muted);
+}
+
+.summary-row dd {
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+.summary-row dd .form-control {
+  max-width: 10rem;
+  text-align: right;
+}
+
+.summary-total {
+  border-bottom: none;
+}
+
+.summary-total dt,
+.summary-total dd {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--sb-text);
+}
+
+/* Server-side stock errors render as a clear danger alert (visual only). */
+#invoice-form .errorlist.nonfield {
+  background-color: #FEE2E2;
+  border: 1px solid #FECACA;
+  border-radius: 0.5rem;
+  color: #7F1D1D;
+  font-weight: 500;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 0;
+}
+
+#invoice-form .errorlist.nonfield:empty {
+  display: none;
+}
+
+/* Printed-bill look for the invoice detail page. */
+.bill-card {
+  max-width: 46rem;
+  margin-inline: auto;
+}
+
+.bill-header {
+  text-align: center;
+  border-bottom: 2px solid var(--sb-text);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.bill-shop {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+.bill-no {
+  color: var(--sb-muted);
+  font-weight: 600;
+}
+
+.bill-meta {
+  display: grid;
+  gap: 0.25rem 1.5rem;
+  grid-template-columns: 1fr;
+  margin-bottom: 1rem;
+}
+
+.bill-meta > div {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.bill-meta dt {
+  font-weight: 500;
+  color: var(--sb-muted);
+  min-width: 5.5rem;
+}
+
+.bill-meta dd {
+  margin-bottom: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.bill-grand {
+  background-color: #F1F5F9;
+  font-size: 1.05rem;
+}
+
+/* Friendly empty states inside list tables. */
+.empty-state {
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+/* ---------- Small screens (~380px): prevent horizontal overflow ---------- */
+canvas {
+  max-width: 100%;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#search-results {
+  overflow-wrap: anywhere;
+}
+
+.bill-meta dd,
+td {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 991.98px) {
+  .invoice-summary {
+    position: static;
+  }
+}
+
+/* ---------- Print: bill only, no nav or buttons ---------- */
+@media print {
+  .app-navbar,
+  .app-footer,
+  .btn,
+  .no-print,
+  .alert {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    font-size: 13px;
+  }
+
+  main.container {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .card,
+  .bill-card,
+  .table-responsive {
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    max-width: 100%;
+  }
+
+  .bill-card .card-body {
+    padding: 0;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+}
