@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db.models import ProtectedError
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -148,10 +148,11 @@ class InvoicePdfView(RoleRequiredMixin, View):
     allowed_roles = BILLING_ROLES
 
     def get(self, request, pk):
-        invoice = (
-            Invoice.objects.select_related("customer", "created_by")
-            .prefetch_related("items__product")
-            .get(pk=pk)
+        invoice = get_object_or_404(
+            Invoice.objects.select_related("customer", "created_by").prefetch_related(
+                "items__product"
+            ),
+            pk=pk,
         )
         pdf_bytes = render_invoice_pdf(invoice)
         resp = HttpResponse(pdf_bytes, content_type="application/pdf")
