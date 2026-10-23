@@ -235,6 +235,9 @@ def test_invoice_create_view_and_pdf(client, staff, customer, cola):
     assert pdf["Content-Type"] == "application/pdf"
     assert pdf.content[:4] == b"%PDF"
 
+    # Missing invoice -> 404, never a 500.
+    assert client.get(reverse("billing:invoice-pdf", args=[999999])).status_code == 404
+
 
 @pytest.mark.django_db
 def test_invoice_list_and_detail(client, owner, customer, cola):
