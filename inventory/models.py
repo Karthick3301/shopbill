@@ -57,10 +57,12 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         """Log every stock change as a StockMovement (model-level guarantee)."""
-        old_stock = None
         is_new = self._state.adding
-        if not is_new:
-            # Remember stock before saving so we can log the delta after.
+        update_fields = kwargs.get("update_fields")
+        # Skip the DB lookup when stock can't have changed (e.g. soft delete).
+        stock_may_change = is_new or not update_fields or "stock" in update_fields
+        old_stock = None
+        if not is_new and stock_may_change:
             old_stock = (
                 Product.objects.filter(pk=self.pk).values_list("stock", flat=True).first()
             )
@@ -72,7 +74,7 @@ class Product(models.Model):
                     change=self.stock,
                     reason=StockMovement.Reasons.INITIAL,
                 )
-        elif old_stock is not None and old_stock != self.stock:
+        elif stock_may_change and old_stock is not None and old_stock != self.stock:
             StockMovement.objects.create(
                 product=self,
                 change=self.stock - old_stock,
