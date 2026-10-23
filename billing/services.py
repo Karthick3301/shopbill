@@ -80,7 +80,9 @@ def create_invoice(*, created_by, customer, lines, tax=0, discount=0):
 
         total = subtotal + tax - discount
         if total < 0:
-            total = Decimal("0")
+            raise ValidationError(
+                "Discount cannot exceed subtotal plus tax."
+            )
 
         invoice = Invoice.objects.create(
             customer=customer,
