@@ -141,7 +141,10 @@ class Command(BaseCommand):
         # Leave 2 products at/below their limit through the normal save()
         # path, so ADJUSTMENT movements exist and low-stock UI has data.
         for name, offset in (("Orange Juice 1L", 0), ("Notebook A4", 3)):
-            product = Product.objects.get(name=name)
+            product = Product.objects.filter(name=name).first()
+            if product is None:
+                self.stdout.write(self.style.WARNING(f"Skipping low-stock setup: '{name}' not found"))
+                continue
             product.stock = max(0, product.low_stock_limit - offset)
             product.save()
         self.stdout.write(self.style.SUCCESS("2 products set to low stock"))
